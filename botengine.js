@@ -5,7 +5,7 @@ var execSync = require('child_process').execSync;
 var obj1;
 var obj2;
 // var token = process.env.SLACK_API_TOKEN || '';
-var token = 'xoxb-83661251794-ugL8LaeBEbnxiGJkWBHI5rqa';
+var token = 'xoxb-83661251794-P3FOoq0Bb6HzYSCfK74tcvcj';
 var curChannel = '';
 var rtm = new RtmClient(token);
 rtm.start();
@@ -57,7 +57,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function(message) {
         console.log(type1);
         console.log(user);
 
-        if(type1 == "ORGANIZATION" || type1 == "PERSON"){
+        if(type1 == "ORGANIZATION" || type1 == "PERSON" || type1 == "CONSUMER_GOOD"){
             console.log("Org or PERSON");
             console.log(type1);
             if (typeof obj1 === 'undefined' || obj1 === null) {
@@ -71,11 +71,12 @@ rtm.on(RTM_EVENTS.MESSAGE, function(message) {
 
                     var keyword = "debate+org+"+nameold+"+"+namenew;
                     scriptexec(keyword);
+                    obj1 = null;
                 }
             }
         }
 
-        rtm.sendMessage("Debug " + " " +name1 + " " + type1 + " " + user, curChannel.toString());
+        // rtm.sendMessage("Debug " + " " +name1 + " " + type1 + " " + user, curChannel.toString());
     } catch (e) {
 
     } finally {
@@ -118,10 +119,19 @@ function scriptexec(keyword){
         // console.log(url1.length);
         for (var i = 0; i < url1.length; i++) {
             var durl = url1[i].displayUrl;
-            var srcfr = "www.debate.org/";
-            console.log(durl.indexOf(srcfr));
-            if(durl.indexOf(srcfr) !== -1){
-                console.log(durl);
+            var srcfr = "www.debate.org/opinion";
+            var srcfr1 = "www.debate.org/debates";
+
+            // console.log(durl.indexOf(srcfr));
+            if(durl.indexOf(srcfr) !== -1 || durl.indexOf(srcfr1) !== -1){
+                urlws = durl.replace("https","http");
+                substr1 = "http://";
+                if(urlws.indexOf(substr1) == -1){
+                    urlws = substr1 + urlws;
+                }
+                console.log(urlws);
+                var result = opinionator(urlws);
+                rtm.sendMessage(result, curChannel.toString());
                 return;
             }
         }
@@ -136,7 +146,17 @@ function nameobj(name, type, user) {
     this.user = user;
 }
 
-
+function opinionator(urls1) {
+    var str = "python scrapper.py "+urls1;
+    console.log(str);
+    try {
+        var tmp = execSync(str).toString();
+        console.log(tmp);
+        return tmp;
+    } catch (e) {
+        console.log(e);
+    }
+}
 // function sendtoRMQ(message){
 //   var amqp = require('amqplib/callback_api');
 //   amqp.connect('amqp://localhost', function(err, conn) {
