@@ -52,13 +52,22 @@ try:
 		win = (html.findAll(match_class(["pos0"]))[0]).string
 		
 		if pro == "Winning":
-			if win == "Pro":
-				summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[0]).string
+			try:
+				if win == "Pro":
+					summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[0]).string
+				else:
+					summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[1]).string
+			except:	
+				pass
 			print remove_adj("I am in favor of "+pro_subj+" "+summary)
 		elif con == "Winning":
-			if win == "Con":
-				summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[0]).string
-
+			try:
+				if win == "Con":
+					summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[0]).string
+				else:
+					summary = (html.findAll(match_class(["flipwordAlternateSpan"]))[1]).string
+			except:
+				pass
 			print remove_adj("I am in favor of "+con_subj+" "+summary)
 		else:
 			print remove_adj("I do not have an opinion of either one.")
